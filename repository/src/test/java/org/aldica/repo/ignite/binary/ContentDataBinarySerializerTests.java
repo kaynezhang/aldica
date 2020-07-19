@@ -119,6 +119,7 @@ public class ContentDataBinarySerializerTests extends GridTestsBase
         serializer.setApplicationContext(applicationContext);
         serializer.setUseIdsWhenReasonable(idsWhenReasonable);
         serializer.setUseRawSerialForm(serialForm);
+        serializer.setUseOptimisedContentURL(serialForm);
         serializer.setUseVariableLengthIntegers(serialForm);
 
         final BinaryTypeConfiguration binaryTypeConfigurationForContentData = new BinaryTypeConfiguration();
@@ -270,17 +271,17 @@ public class ContentDataBinarySerializerTests extends GridTestsBase
                 final IgniteCache<Long, ContentData> referenceCache1 = referenceGrid.getOrCreateCache(cacheConfig);
                 final IgniteCache<Long, ContentData> cache1 = defaultGrid.getOrCreateCache(cacheConfig);
 
-                // saving potential is significant due to variable length primitives - 23%
-                this.efficiencyImpl(referenceGrid, defaultGrid, referenceCache1, cache1, "aldica raw serial", "aldica optimised", 0.23);
+                // saving potential is significant due to variable length primitives and special content URL handling - 34%
+                this.efficiencyImpl(referenceGrid, defaultGrid, referenceCache1, cache1, "aldica raw serial", "aldica optimised", 0.34);
 
                 cacheConfig.setName("comparison2");
                 cacheConfig.setDataRegionName("comparison2");
                 final IgniteCache<Long, ContentData> referenceCache2 = referenceGrid.getOrCreateCache(cacheConfig);
                 final IgniteCache<Long, ContentData> cache2 = useIdGrid.getOrCreateCache(cacheConfig);
 
-                // using an ID with variable length primitives is even more substantial - 39%
+                // using an ID with variable length primitives is even more substantial - 49%
                 this.efficiencyImpl(referenceGrid, useIdGrid, referenceCache2, cache2, "aldica raw serial (ID substitution)",
-                        "aldica optimised", 0.39);
+                        "aldica optimised", 0.49);
 
                 cacheConfig.setName("comparison3");
                 cacheConfig.setDataRegionName("comparison3");
@@ -288,9 +289,9 @@ public class ContentDataBinarySerializerTests extends GridTestsBase
                 final IgniteCache<Long, ContentData> cache3 = useIdGrid.getOrCreateCache(cacheConfig);
 
                 // ID substitution with variable length primitives still saves a lot compared to default serial form with variable length
-                // primitives - 20%
+                // primitives - 23%
                 this.efficiencyImpl(defaultGrid, useIdGrid, referenceCache3, cache3, "aldica raw serial (ID substitution)",
-                        "aldica raw serial", 0.20);
+                        "aldica raw serial", 0.23);
             }
             finally
             {
